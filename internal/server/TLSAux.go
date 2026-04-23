@@ -169,7 +169,9 @@ func composeServerHello(sessionId []byte, nonce [12]byte, encryptedSessionKeyWit
 	serverHello[3] = append(nonce[0:12], encryptedSessionKeyWithTag[0:20]...) // random 32 bytes
 	serverHello[4] = []byte{0x20}                                             // session id length 32
 	serverHello[5] = sessionId                                                // session id
-	serverHello[6] = []byte{0x13, 0x02}                                       // cipher suite TLS_AES_256_GCM_SHA384
+	// Randomly pick between the two common TLS 1.3 ciphers
+	cipherSuites := [][]byte{{0x13, 0x01}, {0x13, 0x02}}
+	serverHello[6] = cipherSuites[common.RandInt(len(cipherSuites))]
 	serverHello[7] = []byte{0x00}                                             // compression method null
 	serverHello[8] = []byte{0x00, 0x2e}                                       // extensions length 46
 
