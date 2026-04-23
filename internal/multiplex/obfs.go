@@ -20,8 +20,11 @@ const salsa20NonceSize = 8
 const maxExtraLen = 1<<8 - 1
 
 // padFirstNFrames specifies the number of initial frames to pad,
-// to avoid TLS-in-TLS detection
-const padFirstNFrames = 5
+// to avoid TLS-in-TLS detection.
+// Raised from 5 to 32 to cover WireGuard handshake + initial data burst,
+// whose distinctive sizes (148B init, 92B response, 128+N*16 data) leak
+// through once padding stops.
+const padFirstNFrames = 32
 
 const (
 	EncryptionMethodPlain = iota
