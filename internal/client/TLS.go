@@ -140,7 +140,7 @@ func (tls *DirectTLS) Handshake(rawConn net.Conn, authInfo AuthInfo) (sessionKey
 	log.Trace("client hello sent successfully")
 	tls.TLSConn = common.NewTLSConn(rawConn)
 
-	buf := make([]byte, 1024)
+	buf := make([]byte, 6144)
 	log.Trace("waiting for ServerHello")
 	_, err = tls.Read(buf)
 	if err != nil {

@@ -42,9 +42,11 @@ func (TLS) processFirstPacket(clientHello []byte, privateKey crypto.PrivateKey) 
 
 func (TLS) makeResponder(clientHelloSessionId []byte, sharedSecret [32]byte) Responder {
 	respond := func(originalConn net.Conn, sessionKey [32]byte, randSource io.Reader) (preparedConn net.Conn, err error) {
-		// the cert length needs to be the same for all handshakes belonging to the same session
-		// we can use sessionKey as a seed here to ensure consistency
-		possibleCertLengths := []int{42, 27, 68, 59, 36, 44, 46}
+		// Realistic sizes for TLS 1.3 encrypted handshake (EncryptedExtensions +
+		// Certificate + CertificateVerify + Finished + AEAD overhead).
+		// Derived from real servers: cloudflare ~2787, github ~2914, google ~3984,
+		// bing ~4099, amazon ~5555.
+		possibleCertLengths := []int{2787, 2914, 3984, 4099, 5555}
 		cert := make([]byte, possibleCertLengths[common.RandInt(len(possibleCertLengths))])
 		common.RandRead(randSource, cert)
 
